@@ -1,9 +1,10 @@
 # Stage pédiatrie – app iPhone (PWA)
 
 Fiches de stage (service S 51), consultables hors ligne :
-- **Essentiels** : enfant qui va mal, RCP, anaphylaxie, hydratation, 5 B, hygiène, sécurité, SBAR, communication, maltraitance
+- **Essentiels** : enfant qui va mal, RCP, anaphylaxie, besoins en eau, 5 B, hygiène des mains
 - **Normes** : constantes vitales, croissance et développement, nouveau-né, biologie, calculs, isolements, douleur
 - **Pathologies**, **Soins**, **Médicaments**
+- **Additionnelles** : sécurité de l'enfant hospitalisé, SBAR, communication selon l'âge, maltraitance
 
 L'accueil affiche le logo et le sommaire complet de toutes les fiches.
 
