@@ -1,6 +1,11 @@
 # Stage pédiatrie – app iPhone (PWA)
 
-Syllabus de stage (service S 51) : fiches pathologies, soins et médicaments, consultables hors ligne.
+Fiches de stage (service S 51), consultables hors ligne :
+- **Essentiels** : enfant qui va mal, RCP, anaphylaxie, hydratation, 5 B, hygiène, sécurité, SBAR, communication, maltraitance
+- **Normes** : constantes vitales, croissance et développement, nouveau-né, biologie, calculs, isolements, douleur
+- **Pathologies**, **Soins**, **Médicaments**
+
+L'accueil affiche le logo et le sommaire complet de toutes les fiches.
 
 ## Installation sur iPhone
 1. Ouvrir l'URL GitHub Pages du dépôt dans **Safari**.
