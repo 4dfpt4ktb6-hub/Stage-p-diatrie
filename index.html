@@ -144,10 +144,16 @@ details.part summary::after{content:"›";font-size:1.4rem;line-height:1;color:v
 details.part[open] summary::after{transform:rotate(90deg)}
 details.part .pn{font-weight:700;font-size:1.08rem;color:var(--c);flex:1}
 details.part .pc{color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums}
-details.part h3{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--c);margin:.9rem 1rem .2rem}
+details.theme{border-top:1px solid var(--line)}
+details.theme summary{display:flex;justify-content:space-between;align-items:center;gap:.8rem;padding:.6rem 1rem .6rem 1.4rem;cursor:pointer;list-style:none}
+details.theme summary::-webkit-details-marker{display:none}
+details.theme summary::after{content:"›";font-size:1.2rem;line-height:1;color:var(--c);transition:transform .15s}
+details.theme[open] summary::after{transform:rotate(90deg)}
+details.theme .tn{flex:1;font-weight:700}
+details.theme[open]{background:var(--soft)}
+details.theme a.row{padding-left:2.2rem;background:var(--paper)}
 details.part a.row{display:flex;gap:.6rem;align-items:baseline;padding:.5rem 1rem;border-top:1px dotted var(--line);text-decoration:none}
 details.part a.row:hover{background:var(--soft)}
-details.part a.row:last-child{margin-bottom:.4rem}
 .home .note{font-size:.88rem;color:var(--muted);margin-top:1.4rem}
 h3.tt{font-size:.82rem;letter-spacing:.09em;text-transform:uppercase;color:var(--c);margin:1.2rem 0 0}
 </style>
@@ -223,10 +229,12 @@ function pageHome(){
   '<h2 class="somt">Sommaire</h2>';
  ORDER.forEach(function(k){
   h+='<details class="part" data-k="'+k+'" style="--c:'+CHIPC[k]+'"'+(opened[k]?' open':'')+'><summary><span class="pn">'+esc(PARTS[k])+'</span><span class="pc">'+(ok[k]?'<span class="ok">'+ok[k]+' ✓</span> · ':'')+n[k]+' fiches</span></summary>';
-  var last='';
-  PAGES.forEach(function(p,i){if(p.part!==k)return;var c=sub(p);
-   if(c!==last){h+='<h3>'+esc(c)+'</h3>';last=c}
-   h+='<a class="row" href="#p'+i+'"><span class="t">'+f(p.title)+'</span>'+(isDone(i)?'<span class="ok">✓</span>':'')+'</a>';});
+  var groups=[],gi={};
+  PAGES.forEach(function(p,i){if(p.part!==k)return;var c=sub(p);if(!(c in gi)){gi[c]=groups.length;groups.push({c:c,items:[]})}groups[gi[c]].items.push(i)});
+  groups.forEach(function(g){var key=k+'/'+g.c,gok=g.items.filter(isDone).length;
+   h+='<details class="theme" data-k="'+esc(key)+'"'+(opened[key]?' open':'')+'><summary><span class="tn">'+esc(g.c)+'</span><span class="pc">'+(gok?'<span class="ok">'+gok+' ✓</span> · ':'')+g.items.length+'</span></summary>';
+   g.items.forEach(function(i){h+='<a class="row" href="#p'+i+'"><span class="t">'+f(PAGES[i].title)+'</span>'+(isDone(i)?'<span class="ok">✓</span>':'')+'</a>'});
+   h+='</details>';});
   h+='</details>';});
  return h+'<p class="note">Ces fiches sont un outil d’étude. Les doses sont des valeurs de référence : elles ne remplacent jamais la prescription médicale ni les protocoles du service. En cas de doute, demande à ton infirmier de référence.</p></div>';}
 function render(){
@@ -240,7 +248,7 @@ function render(){
  document.getElementById('pg').textContent=cur?cur+' / '+NF:'Accueil';
  document.getElementById('bPrev').disabled=cur===0;document.getElementById('bNext').disabled=cur===PAGES.length-1;
  var bd=document.getElementById('bDone');if(bd)bd.onclick=function(){var t=PAGES[cur].title;if(done[t])delete done[t];else done[t]=1;saveDone();bd.setAttribute('aria-pressed',!!done[t]);bd.textContent=done[t]?'✓ Fiche acquise':'Marquer comme acquise'};
- Array.prototype.forEach.call(s.querySelectorAll('details.part'),function(dt){dt.addEventListener('toggle',function(){if(dt.open)opened[dt.dataset.k]=1;else delete opened[dt.dataset.k];saveOpen()})});
+ Array.prototype.forEach.call(s.querySelectorAll('details.part,details.theme'),function(dt){dt.addEventListener('toggle',function(){if(dt.open)opened[dt.dataset.k]=1;else delete opened[dt.dataset.k];saveOpen()})});
  var b2=document.getElementById('bSearch2');if(b2)b2.onclick=openSearch;
  window.scrollTo(0,0);
 }
