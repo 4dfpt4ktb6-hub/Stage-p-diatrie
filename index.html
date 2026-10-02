@@ -159,6 +159,13 @@ details.part a.row{display:flex;gap:.6rem;align-items:baseline;padding:.5rem 1re
 details.part a.row:hover{background:var(--soft)}
 .home .note{font-size:.88rem;color:var(--muted);margin-top:1.4rem}
 button.sfield{display:flex;align-items:center;gap:.55rem;width:100%;margin:.4rem 0 0;padding:.65rem .9rem;border:0;border-radius:12px;background:var(--soft);color:var(--muted);font-size:1rem;text-align:left}
+section.notes{margin-top:1.4rem;padding:.8rem 1rem 1rem;border-radius:10px;background:var(--soft);border:1px dashed var(--line)}
+section.notes h2{margin:0 0 .45rem;font-size:.82rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--c)}
+section.notes textarea{display:block;width:100%;min-height:4.5rem;resize:none;overflow:hidden;font:inherit;font-size:16px;line-height:1.45;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem}
+section.notes textarea:focus{outline:2px solid var(--c);outline-offset:1px}
+section.notes small{display:block;min-height:1.2em;margin-top:.3rem;color:var(--muted);font-size:.78rem}
+.nt{color:var(--muted);font-size:.95rem;margin-left:.3rem}
+details.part a.nrow{padding-left:1.4rem}
 h3.tt{font-size:.82rem;letter-spacing:.09em;text-transform:uppercase;color:var(--c);margin:1.2rem 0 0}
 /* animation d'ouverture */
 #splash{position:fixed;inset:0;z-index:50;overflow:hidden;display:grid;place-items:center;text-align:center;
@@ -214,6 +221,10 @@ var NF=PAGES.length-1;
 var cur=0, done={}, opened={};
 try{done=JSON.parse(localStorage.getItem('fiches_done')||'{}')}catch(e){}
 try{opened=JSON.parse(localStorage.getItem('som_open')||'{}')}catch(e){}
+var notes={};try{notes=JSON.parse(localStorage.getItem('fiches_notes')||'{}')}catch(e){}
+function saveNotes(){try{localStorage.setItem('fiches_notes',JSON.stringify(notes));return true}catch(e){return false}}
+function hasNote(i){var t=notes[PAGES[i].title];return !!(t&&t.trim())}
+var PEN='<span class="nt" title="Fiche avec une note">✎</span>';
 function saveDone(){try{localStorage.setItem('fiches_done',JSON.stringify(done))}catch(e){}}
 function saveOpen(){try{localStorage.setItem('som_open',JSON.stringify(opened))}catch(e){}}
 function isDone(i){return !!done[PAGES[i].title]}
@@ -268,13 +279,16 @@ function pageHome(){
   '<div><div class="kick">Fiches de poche</div><h1>Stage de pédiatrie</h1><p class="sub">Service S 51 · '+NF+' fiches'+(nd?' · <span class="ok">'+nd+' acquises ✓</span>':'')+'</p></div></div>'+
   '<button class="sfield" type="button" id="bSearch2"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>Rechercher une fiche</button>'+
   '<h2 class="somt">Sommaire</h2>';
+ var wn=[];PAGES.forEach(function(q,i){if(q.part&&hasNote(i))wn.push(i)});
+ if(wn.length){h+='<details class="part" data-k="notes" style="--c:var(--ink)"'+(opened.notes?' open':'')+'><summary><span class="pn">✎ Mes notes</span><span class="pc">'+wn.length+' fiche'+(wn.length>1?'s':'')+'</span></summary>'+
+  wn.map(function(i){var t=notes[PAGES[i].title].trim().split('\n')[0];return '<a class="row nrow" href="#p'+i+'"><span class="t">'+f(PAGES[i].title)+'<span class="d">'+esc(t.length>90?t.slice(0,90)+'…':t)+'</span></span></a>'}).join('')+'</details>'}
  ORDER.forEach(function(k){
   h+='<details class="part" data-k="'+k+'" style="--c:'+CHIPC[k]+'"'+(opened[k]?' open':'')+'><summary><span class="pn">'+esc(PARTS[k])+'</span><span class="pc">'+(ok[k]?'<span class="ok">'+ok[k]+' ✓</span> · ':'')+n[k]+' fiches</span></summary>';
   var groups=[],gi={};
   PAGES.forEach(function(p,i){if(p.part!==k)return;var c=sub(p);if(!(c in gi)){gi[c]=groups.length;groups.push({c:c,items:[]})}groups[gi[c]].items.push(i)});
   groups.forEach(function(g){var key=k+'/'+g.c,gok=g.items.filter(isDone).length;
    h+='<details class="theme" data-k="'+esc(key)+'"'+(opened[key]?' open':'')+'><summary><span class="tn">'+esc(g.c)+'</span><span class="pc">'+(gok?'<span class="ok">'+gok+' ✓</span> · ':'')+g.items.length+'</span></summary>';
-   g.items.forEach(function(i){h+='<a class="row" href="#p'+i+'"><span class="t">'+f(PAGES[i].title)+'</span>'+(isDone(i)?'<span class="ok">✓</span>':'')+'</a>'});
+   g.items.forEach(function(i){h+='<a class="row" href="#p'+i+'"><span class="t">'+f(PAGES[i].title)+'</span>'+(hasNote(i)?PEN:'')+(isDone(i)?'<span class="ok">✓</span>':'')+'</a>'});
    h+='</details>';});
   h+='</details>';});
  return h+'<p class="note">Ces fiches sont un outil d’étude. Les doses sont des valeurs de référence : elles ne remplacent jamais la prescription médicale ni les protocoles du service. En cas de doute, demande à ton infirmier de référence.</p></div>';}
@@ -283,7 +297,7 @@ function render(){
  if(p.k==='home'){h=pageHome()}
  else{cls+=' p-'+p.part;
   var inner=p.k==='patho'?pagePatho(p):p.k==='proc'?pageProc(p):p.k==='drug'?pageDrug(p):pageFiche(p);
-  h=band(p,cur)+'<div class="body">'+inner+'</div>'+foot(cur);}
+  h=band(p,cur)+'<div class="body">'+inner+'<section class="notes"><h2>Mes notes</h2><textarea id="note" rows="3" placeholder="Écris ici ce que tu veux retenir : une explication de l’IR, une astuce, un cas vu en stage…"></textarea><small id="noteMsg" aria-live="polite"></small></section></div>'+foot(cur);}
  var s=document.getElementById('sheet');s.className=cls;s.innerHTML=h;
  document.getElementById('brand').textContent=p.k==='home'?'Stage de pédiatrie':plain(p.title);
  document.getElementById('pg').textContent=cur?cur+' / '+NF:'Accueil';
@@ -291,6 +305,10 @@ function render(){
  var bd=document.getElementById('bDone');if(bd)bd.onclick=function(){var t=PAGES[cur].title;if(done[t])delete done[t];else done[t]=1;saveDone();bd.setAttribute('aria-pressed',!!done[t]);bd.textContent=done[t]?'✓ Fiche acquise':'Marquer comme acquise'};
  Array.prototype.forEach.call(s.querySelectorAll('details.part,details.theme'),function(dt){dt.addEventListener('toggle',function(){if(dt.open)opened[dt.dataset.k]=1;else delete opened[dt.dataset.k];saveOpen()})});
  var b2=document.getElementById('bSearch2');if(b2)b2.onclick=openSearch;
+ var ta=document.getElementById('note');if(ta){var key=p.title,tm=null,msg=document.getElementById('noteMsg');
+  ta.value=notes[key]||'';var grow=function(){ta.style.height='auto';ta.style.height=(ta.scrollHeight+2)+'px'};grow();
+  ta.addEventListener('input',function(){grow();if(ta.value.trim())notes[key]=ta.value;else delete notes[key];var ok=saveNotes();
+   clearTimeout(tm);msg.textContent='';tm=setTimeout(function(){msg.textContent=ok?'Enregistré sur ce téléphone':'Impossible d’enregistrer (stockage bloqué)'},400)});}
  window.scrollTo(0,0);
 }
 function go(i,noHash){i=Math.max(0,Math.min(PAGES.length-1,i));cur=i;if(!noHash){try{history.replaceState(null,'','#p'+i)}catch(e){location.hash='p'+i}}render()}
@@ -299,10 +317,10 @@ window.addEventListener('hashchange',function(){go(fromHash(),true)});
 document.getElementById('bPrev').onclick=function(){go(cur-1)};
 document.getElementById('bNext').onclick=function(){go(cur+1)};
 document.getElementById('bToc').onclick=function(){go(0)};
-document.addEventListener('keydown',function(e){if(e.target.tagName==='INPUT')return;if(e.key==='ArrowRight')go(cur+1);if(e.key==='ArrowLeft')go(cur-1)});
+document.addEventListener('keydown',function(e){if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;if(e.key==='ArrowRight')go(cur+1);if(e.key==='ArrowLeft')go(cur-1)});
 var tx=0,ty=0,tt=null;
 document.getElementById('sheet').addEventListener('touchstart',function(e){tt=e.target;tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
-document.getElementById('sheet').addEventListener('touchend',function(e){if(tt&&tt.closest&&tt.closest('.tw'))return;var dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;if(Math.abs(dx)>70&&Math.abs(dy)<45){go(cur+(dx<0?1:-1))}},{passive:true});
+document.getElementById('sheet').addEventListener('touchend',function(e){if(tt&&tt.closest&&tt.closest('.tw,textarea'))return;var dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;if(Math.abs(dx)>70&&Math.abs(dy)<45){go(cur+(dx<0?1:-1))}},{passive:true});
 /* recherche */
 function norm(s){return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')}
 var IDX=PAGES.map(function(p){return norm(JSON.stringify(p))});
@@ -314,7 +332,7 @@ function openSearch(){
  document.getElementById('xs').onclick=close;ov.addEventListener('click',function(e){if(e.target===ov)close()});
  q.addEventListener('keydown',function(e){if(e.key==='Escape')close()});
  q.addEventListener('input',function(){var t=norm(q.value.trim());if(t.length<2){res.innerHTML='';return}
-  var out=[];PAGES.forEach(function(p,i){if(p.k==='home')return;var inT=norm(p.title).indexOf(t)>=0,inB=IDX[i].indexOf(t)>=0;if(inT||inB)out.push([inT?0:1,i])});
+  var out=[];PAGES.forEach(function(p,i){if(p.k==='home')return;var inT=norm(p.title).indexOf(t)>=0,inB=IDX[i].indexOf(t)>=0||norm(notes[p.title]||'').indexOf(t)>=0;if(inT||inB)out.push([inT?0:1,i])});
   out.sort(function(a,b){return a[0]-b[0]||a[1]-b[1]});
   res.innerHTML=out.slice(0,40).map(function(o){var p=PAGES[o[1]];return '<a href="#p'+o[1]+'"><strong>'+esc(plain(p.title))+'</strong><small>'+esc(PARTS[p.part])+' · '+esc(sub(p))+(o[0]?' · cité dans la fiche':'')+'</small></a>'}).join('')||'<p>Aucun résultat.</p>';
   Array.prototype.forEach.call(res.querySelectorAll('a'),function(a){a.addEventListener('click',close)});});
