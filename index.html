@@ -160,9 +160,37 @@ details.part a.row:hover{background:var(--soft)}
 .home .note{font-size:.88rem;color:var(--muted);margin-top:1.4rem}
 button.sfield{display:flex;align-items:center;gap:.55rem;width:100%;margin:.4rem 0 0;padding:.65rem .9rem;border:0;border-radius:12px;background:var(--soft);color:var(--muted);font-size:1rem;text-align:left}
 h3.tt{font-size:.82rem;letter-spacing:.09em;text-transform:uppercase;color:var(--c);margin:1.2rem 0 0}
+/* animation d'ouverture */
+#splash{position:fixed;inset:0;z-index:50;overflow:hidden;display:grid;place-items:center;text-align:center;
+ background:radial-gradient(120% 80% at 50% 0%,#fff6d8 0%,#ffe2b0 45%,#ffc59a 100%);color:#5a3a24;
+ transition:opacity .7s ease,transform .9s ease}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #splash{background:radial-gradient(120% 80% at 50% 0%,#3a3157 0%,#2a2340 50%,#1a1628 100%);color:#ffe6c7}}
+#splash.out{opacity:0;transform:scale(1.06);pointer-events:none}
+#splash .sp-in{position:relative;z-index:2;padding:24px}
+#splash .sp-logo{width:132px;height:132px;border-radius:30px;box-shadow:0 18px 40px -14px rgba(120,60,10,.45);
+ animation:spPop 1s cubic-bezier(.2,1.4,.4,1) both,spFloat 3.2s ease-in-out 1s infinite}
+#splash h1{font-family:var(--serif);font-size:2rem;margin:1.1rem 0 .3rem;color:inherit;animation:spUp .8s ease .45s both}
+#splash p{margin:0;font-size:1.05rem;opacity:.85;animation:spUp .8s ease .75s both}
+#splash .sp-tap{position:absolute;left:0;right:0;bottom:calc(28px + env(safe-area-inset-bottom,0px));font-size:.8rem;opacity:0;animation:spFade .6s ease 1.6s forwards;z-index:2}
+#splash .bub{position:absolute;bottom:-60px;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.95),rgba(255,255,255,.35) 60%,rgba(255,255,255,.1));
+ box-shadow:inset 0 0 6px rgba(255,255,255,.6);animation:spRise linear infinite;opacity:.8}
+#splash .cloud{position:absolute;width:220px;height:70px;border-radius:50px;background:rgba(255,255,255,.55);filter:blur(10px);animation:spDrift 9s ease-in-out infinite alternate}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #splash .cloud{background:rgba(255,220,180,.10)}:root:not([data-theme="light"]) #splash .bub{opacity:.35}}
+@keyframes spPop{from{opacity:0;transform:scale(.4) translateY(30px)}to{opacity:1;transform:none}}
+@keyframes spFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes spUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes spFade{to{opacity:.6}}
+@keyframes spRise{0%{transform:translate(0,0)}50%{transform:translate(var(--sw,20px),-55vh)}100%{transform:translate(0,-115vh)}}
+@keyframes spDrift{from{transform:translateX(-30px)}to{transform:translateX(30px)}}
+@media (prefers-reduced-motion:reduce){#splash *{animation:none!important}#splash .sp-tap{opacity:.6}}
 </style>
 </head>
 <body>
+<div id="splash" role="presentation">
+ <div class="cloud" style="top:12%;left:-60px"></div><div class="cloud" style="top:68%;right:-80px;animation-delay:-4s"></div>
+ <div class="sp-in"><img class="sp-logo" src="logo.svg" alt=""><h1>Stage de pédiatrie</h1><p>Une fiche à la fois, tu vas y arriver.</p></div>
+ <div class="sp-tap">Touche l'écran pour passer</div>
+</div>
 <div class="app" id="app">
  <div class="top"><a class="logo" href="#p0" aria-label="Accueil"><img src="logo.svg" alt="" width="30" height="30"></a><div class="brand" id="brand">Stage de pédiatrie</div>
   <button class="icb" id="bSearch" type="button" aria-label="Rechercher"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button><button class="icb" id="bToc" type="button" aria-label="Sommaire"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="3.5" cy="6" r="1.4" fill="currentColor"/><circle cx="3.5" cy="12" r="1.4" fill="currentColor"/><circle cx="3.5" cy="18" r="1.4" fill="currentColor"/></svg></button></div>
@@ -284,6 +312,14 @@ function openSearch(){
   Array.prototype.forEach.call(res.querySelectorAll('a'),function(a){a.addEventListener('click',close)});});
 }
 document.getElementById('bSearch').onclick=openSearch;
+/* animation d'ouverture : une fois par lancement, touchée = passer */
+(function(){var sp=document.getElementById('splash');if(!sp)return;
+ var seen=false;try{seen=sessionStorage.getItem('splash')==='1';sessionStorage.setItem('splash','1')}catch(e){}
+ if(seen){sp.remove();return}
+ for(var i=0;i<16;i++){var b=document.createElement('span');b.className='bub';var z=8+Math.random()*34;
+  b.style.cssText='width:'+z+'px;height:'+z+'px;left:'+(Math.random()*100)+'%;animation-duration:'+(5+Math.random()*6)+'s;animation-delay:'+(-Math.random()*8)+'s;--sw:'+(Math.random()*60-30)+'px';sp.appendChild(b)}
+ var done=false;function close(){if(done)return;done=true;sp.classList.add('out');setTimeout(function(){sp.remove()},900)}
+ sp.addEventListener('click',close);setTimeout(close,2800);})();
 go(fromHash(),true);
 </script>
 <script>
