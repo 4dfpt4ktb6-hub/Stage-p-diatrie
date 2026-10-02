@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs><linearGradient id="b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd86b"/><stop offset="1" stop-color="#ff9f5a"/></linearGradient></defs>
+<rect width="512" height="512" fill="url(#b)"/>
+<circle cx="256" cy="560" r="300" fill="#fff" opacity=".18"/>
+<!-- oreilles -->
+<circle cx="130" cy="150" r="62" fill="#8a5a3c"/><circle cx="130" cy="150" r="32" fill="#f3b894"/>
+<circle cx="382" cy="150" r="62" fill="#8a5a3c"/><circle cx="382" cy="150" r="32" fill="#f3b894"/>
+<!-- tete -->
+<ellipse cx="256" cy="268" rx="170" ry="158" fill="#a87049"/>
+<ellipse cx="256" cy="310" rx="86" ry="66" fill="#f6d2b0"/>
+<ellipse cx="256" cy="278" rx="26" ry="19" fill="#3b2418"/>
+<path d="M256 297v22M256 319c-16 22-42 20-52 6M256 319c16 22 42 20 52 6" stroke="#3b2418" stroke-width="9" stroke-linecap="round" fill="none"/>
+<circle cx="190" cy="236" r="19" fill="#3b2418"/><circle cx="322" cy="236" r="19" fill="#3b2418"/>
+<circle cx="196" cy="229" r="7" fill="#fff"/><circle cx="328" cy="229" r="7" fill="#fff"/>
+<circle cx="150" cy="288" r="22" fill="#ff8f8f" opacity=".55"/><circle cx="362" cy="288" r="22" fill="#ff8f8f" opacity=".55"/>
+<!-- bonnet pediatrique -->
+<path d="M150 165c10-48 60-74 106-74s96 26 106 74c-70-30-142-30-212 0z" fill="#2fb8ac"/>
+<path d="M256 108v52M230 134h52" stroke="#fff" stroke-width="16" stroke-linecap="round"/>
+<!-- stethoscope -->
+<path d="M150 440c-6-50 30-70 106-70s112 20 106 70" stroke="#26435a" stroke-width="16" stroke-linecap="round" fill="none"/>
+<circle cx="256" cy="470" r="30" fill="#e6eef2" stroke="#26435a" stroke-width="12"/>
+<circle cx="256" cy="470" r="11" fill="#2fb8ac"/>
+</svg>
