@@ -2,6 +2,7 @@
 
 Fiches de stage (service S 51), consultables hors ligne :
 - **Essentiels** : enfant qui va mal, RCP, anaphylaxie, besoins en eau, 5 B, hygiène des mains
+- **Connaissances de base** : développement et croissance, physiologie du nouveau-né, systèmes respiratoire, nerveux et digestif
 - **Normes** : constantes vitales, croissance et développement, nouveau-né, biologie, calculs, isolements, douleur
 - **Pathologies**, **Soins**, **Médicaments**
 - **Additionnelles** : sécurité de l'enfant hospitalisé, SBAR, communication selon l'âge, maltraitance
