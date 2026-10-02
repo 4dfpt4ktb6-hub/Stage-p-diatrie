@@ -164,8 +164,12 @@ section.notes h2{margin:0 0 .45rem;font-size:.82rem;letter-spacing:.09em;text-tr
 section.notes textarea{display:block;width:100%;min-height:4.5rem;resize:none;overflow:hidden;font:inherit;font-size:16px;line-height:1.45;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem}
 section.notes textarea:focus{outline:2px solid var(--c);outline-offset:1px}
 section.notes small{display:block;min-height:1.2em;margin-top:.3rem;color:var(--muted);font-size:.78rem}
-.nt{color:var(--muted);font-size:.95rem;margin-left:.3rem}
-details.part a.nrow{padding-left:1.4rem}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ov .gnotes{color-scheme:dark}}
+.gnotes{display:flex;flex-direction:column}
+.gnotes h2{font-family:var(--serif);font-size:1.4rem;margin:.1rem 0 .2rem}
+.gnotes .gn-sub{margin:0 0 .7rem;color:var(--muted);font-size:.9rem}
+.gnotes textarea{width:100%;min-height:45vh;resize:vertical;font:inherit;font-size:16px;line-height:1.45;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:8px;padding:.7rem .8rem}
+.gnotes small{min-height:1.2em;margin-top:.3rem;color:var(--muted);font-size:.78rem}
 h3.tt{font-size:.82rem;letter-spacing:.09em;text-transform:uppercase;color:var(--c);margin:1.2rem 0 0}
 /* animation d'ouverture */
 #splash{position:fixed;inset:0;z-index:50;overflow:hidden;display:grid;place-items:center;text-align:center;
@@ -208,7 +212,7 @@ h3.tt{font-size:.82rem;letter-spacing:.09em;text-transform:uppercase;color:var(-
 </div>
 <div class="app" id="app">
  <div class="top"><a class="logo" href="#p0" aria-label="Accueil"><img src="logo.svg" alt="" width="30" height="30"></a><div class="brand" id="brand">Stage de pédiatrie</div>
-  <button class="icb" id="bSearch" type="button" aria-label="Rechercher"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button><button class="icb" id="bToc" type="button" aria-label="Sommaire"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="3.5" cy="6" r="1.4" fill="currentColor"/><circle cx="3.5" cy="12" r="1.4" fill="currentColor"/><circle cx="3.5" cy="18" r="1.4" fill="currentColor"/></svg></button></div>
+  <button class="icb" id="bSearch" type="button" aria-label="Rechercher"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button><button class="icb" id="bNotes" type="button" aria-label="Notes générales"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5 3h10l4 4v14H5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 11h7M8.5 15h7M8.5 7h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button><button class="icb" id="bToc" type="button" aria-label="Sommaire"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="3.5" cy="6" r="1.4" fill="currentColor"/><circle cx="3.5" cy="12" r="1.4" fill="currentColor"/><circle cx="3.5" cy="18" r="1.4" fill="currentColor"/></svg></button></div>
  <main><article class="sheet" id="sheet" aria-live="polite"></article></main>
  <div class="bot"><button class="nb" id="bPrev" type="button" aria-label="Fiche précédente"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="pg" id="pg"></span><button class="nb" id="bNext" type="button" aria-label="Fiche suivante"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
 </div>
@@ -223,8 +227,6 @@ try{done=JSON.parse(localStorage.getItem('fiches_done')||'{}')}catch(e){}
 try{opened=JSON.parse(localStorage.getItem('som_open')||'{}')}catch(e){}
 var notes={};try{notes=JSON.parse(localStorage.getItem('fiches_notes')||'{}')}catch(e){}
 function saveNotes(){try{localStorage.setItem('fiches_notes',JSON.stringify(notes));return true}catch(e){return false}}
-function hasNote(i){var t=notes[PAGES[i].title];return !!(t&&t.trim())}
-var PEN='<span class="nt" title="Fiche avec une note">✎</span>';
 function saveDone(){try{localStorage.setItem('fiches_done',JSON.stringify(done))}catch(e){}}
 function saveOpen(){try{localStorage.setItem('som_open',JSON.stringify(opened))}catch(e){}}
 function isDone(i){return !!done[PAGES[i].title]}
@@ -279,16 +281,14 @@ function pageHome(){
   '<div><div class="kick">Fiches de poche</div><h1>Stage de pédiatrie</h1><p class="sub">Service S 51 · '+NF+' fiches'+(nd?' · <span class="ok">'+nd+' acquises ✓</span>':'')+'</p></div></div>'+
   '<button class="sfield" type="button" id="bSearch2"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>Rechercher une fiche</button>'+
   '<h2 class="somt">Sommaire</h2>';
- var wn=[];PAGES.forEach(function(q,i){if(q.part&&hasNote(i))wn.push(i)});
- if(wn.length){h+='<details class="part" data-k="notes" style="--c:var(--ink)"'+(opened.notes?' open':'')+'><summary><span class="pn">✎ Mes notes</span><span class="pc">'+wn.length+' fiche'+(wn.length>1?'s':'')+'</span></summary>'+
-  wn.map(function(i){var t=notes[PAGES[i].title].trim().split('\n')[0];return '<a class="row nrow" href="#p'+i+'"><span class="t">'+f(PAGES[i].title)+'<span class="d">'+esc(t.length>90?t.slice(0,90)+'…':t)+'</span></span></a>'}).join('')+'</details>'}
+
  ORDER.forEach(function(k){
   h+='<details class="part" data-k="'+k+'" style="--c:'+CHIPC[k]+'"'+(opened[k]?' open':'')+'><summary><span class="pn">'+esc(PARTS[k])+'</span><span class="pc">'+(ok[k]?'<span class="ok">'+ok[k]+' ✓</span> · ':'')+n[k]+' fiches</span></summary>';
   var groups=[],gi={};
   PAGES.forEach(function(p,i){if(p.part!==k)return;var c=sub(p);if(!(c in gi)){gi[c]=groups.length;groups.push({c:c,items:[]})}groups[gi[c]].items.push(i)});
   groups.forEach(function(g){var key=k+'/'+g.c,gok=g.items.filter(isDone).length;
    h+='<details class="theme" data-k="'+esc(key)+'"'+(opened[key]?' open':'')+'><summary><span class="tn">'+esc(g.c)+'</span><span class="pc">'+(gok?'<span class="ok">'+gok+' ✓</span> · ':'')+g.items.length+'</span></summary>';
-   g.items.forEach(function(i){h+='<a class="row" href="#p'+i+'"><span class="t">'+f(PAGES[i].title)+'</span>'+(hasNote(i)?PEN:'')+(isDone(i)?'<span class="ok">✓</span>':'')+'</a>'});
+   g.items.forEach(function(i){h+='<a class="row" href="#p'+i+'"><span class="t">'+f(PAGES[i].title)+'</span>'+(isDone(i)?'<span class="ok">✓</span>':'')+'</a>'});
    h+='</details>';});
   h+='</details>';});
  return h+'<p class="note">Ces fiches sont un outil d’étude. Les doses sont des valeurs de référence : elles ne remplacent jamais la prescription médicale ni les protocoles du service. En cas de doute, demande à ton infirmier de référence.</p></div>';}
@@ -338,6 +338,18 @@ function openSearch(){
   Array.prototype.forEach.call(res.querySelectorAll('a'),function(a){a.addEventListener('click',close)});});
 }
 document.getElementById('bSearch').onclick=openSearch;
+/* notes générales */
+document.getElementById('bNotes').onclick=function(){
+ var ov=document.createElement('div');ov.className='ov';
+ ov.innerHTML='<div class="pan gnotes"><h2>Notes générales</h2><p class="gn-sub">Tout ce qui ne concerne pas une seule fiche : horaires, codes, numéros utiles, objectifs de stage, questions à poser…</p><textarea id="gnote" placeholder="Écris ici…"></textarea><small id="gnMsg" aria-live="polite"></small><p><button class="ib" id="gnClose" type="button">Fermer</button></p></div>';
+ document.body.appendChild(ov);var ta=document.getElementById('gnote'),msg=document.getElementById('gnMsg'),tm=null;
+ try{ta.value=localStorage.getItem('notes_generales')||''}catch(e){}
+ function close(){ov.remove()}
+ document.getElementById('gnClose').onclick=close;ov.addEventListener('click',function(e){if(e.target===ov)close()});
+ ta.addEventListener('keydown',function(e){if(e.key==='Escape')close()});
+ ta.addEventListener('input',function(){var ok=true;try{localStorage.setItem('notes_generales',ta.value)}catch(e){ok=false}
+  clearTimeout(tm);msg.textContent='';tm=setTimeout(function(){msg.textContent=ok?'Enregistré sur ce téléphone':'Impossible d’enregistrer (stockage bloqué)'},400)});
+ ta.focus();};
 /* animation d'ouverture : une fois par lancement, touchée = passer */
 (function(){var sp=document.getElementById('splash');if(!sp)return;
  var seen=false;try{seen=sessionStorage.getItem('splash')==='1';sessionStorage.setItem('splash','1')}catch(e){}
