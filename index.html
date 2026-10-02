@@ -166,9 +166,18 @@ section.notes textarea:focus{outline:2px solid var(--c);outline-offset:1px}
 section.notes small{display:block;min-height:1.2em;margin-top:.3rem;color:var(--muted);font-size:.78rem}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ov .gnotes{color-scheme:dark}}
 .gnotes{display:flex;flex-direction:column}
-.gnotes h2{font-family:var(--serif);font-size:1.4rem;margin:.1rem 0 .2rem}
-.gnotes .gn-sub{margin:0 0 .7rem;color:var(--muted);font-size:.9rem}
-.gnotes textarea{width:100%;min-height:45vh;resize:vertical;font:inherit;font-size:16px;line-height:1.45;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:8px;padding:.7rem .8rem}
+.gn-head{display:flex;justify-content:space-between;align-items:center;gap:.6rem;margin-bottom:.4rem}
+.gnotes h2{font-family:var(--serif);font-size:1.4rem;margin:.1rem 0}
+.gnotes .gn-sub{margin:0 0 .8rem;color:var(--muted);font-size:.9rem}
+.gn-new{width:100%;padding:.75rem;border:2px dashed var(--line);border-radius:10px;background:transparent;color:var(--c-patho);font-weight:700;font-size:1rem}
+.gn-list{margin-top:.6rem}
+.gn-item{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;padding:.7rem .3rem;color:var(--ink)}
+.gn-item strong{display:block}
+.gn-item span{display:block;color:var(--muted);font-size:.9rem;margin-top:.1rem}
+.gn-item small{display:block;color:var(--muted);font-size:.75rem;margin-top:.2rem}
+.gn-empty{color:var(--muted);text-align:center;margin:1.2rem 0}
+.gn-del{color:var(--alert)}
+.gnotes textarea{width:100%;min-height:55vh;resize:vertical;font:inherit;font-size:16px;line-height:1.45;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:8px;padding:.7rem .8rem;margin-top:.3rem}
 .gnotes small{min-height:1.2em;margin-top:.3rem;color:var(--muted);font-size:.78rem}
 h3.tt{font-size:.82rem;letter-spacing:.09em;text-transform:uppercase;color:var(--c);margin:1.2rem 0 0}
 /* animation d'ouverture */
@@ -338,18 +347,42 @@ function openSearch(){
   Array.prototype.forEach.call(res.querySelectorAll('a'),function(a){a.addEventListener('click',close)});});
 }
 document.getElementById('bSearch').onclick=openSearch;
-/* notes générales */
+/* notes générales : plusieurs notes, enregistrées sur le téléphone */
+function loadGN(){var l=[];try{l=JSON.parse(localStorage.getItem('notes_gen')||'null')}catch(e){}
+ if(!Array.isArray(l)){l=[];try{var old=localStorage.getItem('notes_generales');if(old&&old.trim())l.push({id:Date.now(),t:old,u:Date.now()})}catch(e){}}
+ return l}
+function saveGN(l){try{localStorage.setItem('notes_gen',JSON.stringify(l));return true}catch(e){return false}}
+function gnTitle(t){var x=(t||'').trim().split('\n')[0];return x?(x.length>60?x.slice(0,60)+'…':x):'Note sans titre'}
+function gnDate(u){try{return new Date(u).toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+' · '+new Date(u).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}catch(e){return ''}}
 document.getElementById('bNotes').onclick=function(){
- var ov=document.createElement('div');ov.className='ov';
- ov.innerHTML='<div class="pan gnotes"><h2>Notes générales</h2><p class="gn-sub">Tout ce qui ne concerne pas une seule fiche : horaires, codes, numéros utiles, objectifs de stage, questions à poser…</p><textarea id="gnote" placeholder="Écris ici…"></textarea><small id="gnMsg" aria-live="polite"></small><p><button class="ib" id="gnClose" type="button">Fermer</button></p></div>';
- document.body.appendChild(ov);var ta=document.getElementById('gnote'),msg=document.getElementById('gnMsg'),tm=null;
- try{ta.value=localStorage.getItem('notes_generales')||''}catch(e){}
- function close(){ov.remove()}
- document.getElementById('gnClose').onclick=close;ov.addEventListener('click',function(e){if(e.target===ov)close()});
- ta.addEventListener('keydown',function(e){if(e.key==='Escape')close()});
- ta.addEventListener('input',function(){var ok=true;try{localStorage.setItem('notes_generales',ta.value)}catch(e){ok=false}
-  clearTimeout(tm);msg.textContent='';tm=setTimeout(function(){msg.textContent=ok?'Enregistré sur ce téléphone':'Impossible d’enregistrer (stockage bloqué)'},400)});
- ta.focus();};
+ var ov=document.createElement('div');ov.className='ov';ov.innerHTML='<div class="pan gnotes" id="gnPan"></div>';document.body.appendChild(ov);
+ var pan=document.getElementById('gnPan'),list=loadGN();
+ function close(){list=list.filter(function(n){return n.t.trim()});saveGN(list);ov.remove()}
+ ov.addEventListener('click',function(e){if(e.target===ov)close()});
+ function showList(){
+  list=list.filter(function(n){return n.t.trim()});saveGN(list);list.sort(function(x,y){return y.u-x.u});
+  pan.innerHTML='<div class="gn-head"><h2>Notes générales</h2><button class="ib" id="gnClose" type="button">Fermer</button></div>'+
+   '<p class="gn-sub">Horaires, codes, numéros utiles, objectifs de stage, questions à poser… La 1re ligne sert de titre.</p>'+
+   '<button class="gn-new" id="gnNew" type="button">+ Nouvelle note</button>'+
+   (list.length?'<div class="gn-list">'+list.map(function(n){var rest=n.t.trim().split('\n').slice(1).join(' ').trim();
+     return '<button class="gn-item" type="button" data-id="'+n.id+'"><strong>'+esc(gnTitle(n.t))+'</strong>'+(rest?'<span>'+esc(rest.length>80?rest.slice(0,80)+'…':rest)+'</span>':'')+'<small>'+gnDate(n.u)+'</small></button>'}).join('')+'</div>'
+   :'<p class="gn-empty">Aucune note pour l’instant.</p>');
+  document.getElementById('gnClose').onclick=close;
+  document.getElementById('gnNew').onclick=function(){var n={id:Date.now(),t:'',u:Date.now()};list.push(n);showEdit(n)};
+  Array.prototype.forEach.call(pan.querySelectorAll('.gn-item'),function(bt){bt.onclick=function(){var id=+bt.dataset.id;showEdit(list.filter(function(n){return n.id===id})[0])}});
+ }
+ function showEdit(n){
+  pan.innerHTML='<div class="gn-head"><button class="ib" id="gnBack" type="button">‹ Toutes les notes</button><button class="ib gn-del" id="gnDel" type="button">Supprimer</button></div>'+
+   '<textarea id="gnote" placeholder="Titre de la note&#10;Puis ton texte…"></textarea><small id="gnMsg" aria-live="polite"></small>';
+  var ta=document.getElementById('gnote'),msg=document.getElementById('gnMsg'),tm=null;ta.value=n.t;
+  ta.addEventListener('input',function(){n.t=ta.value;n.u=Date.now();var ok=saveGN(list.filter(function(x){return x.t.trim()}));
+   clearTimeout(tm);msg.textContent='';tm=setTimeout(function(){msg.textContent=ok?'Enregistré sur ce téléphone':'Impossible d’enregistrer (stockage bloqué)'},400)});
+  ta.addEventListener('keydown',function(e){if(e.key==='Escape')showList()});
+  document.getElementById('gnBack').onclick=showList;
+  document.getElementById('gnDel').onclick=function(){if(!n.t.trim()||confirm('Supprimer cette note ?')){list=list.filter(function(x){return x!==n});saveGN(list);showList()}};
+  ta.focus();
+ }
+ showList();};
 /* animation d'ouverture : une fois par lancement, touchée = passer */
 (function(){var sp=document.getElementById('splash');if(!sp)return;
  var seen=false;try{seen=sessionStorage.getItem('splash')==='1';sessionStorage.setItem('splash','1')}catch(e){}
