@@ -1,3 +1,17 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f6f6b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Stage Pédia">
+<meta name="description" content="Fiches pathologies, soins et médicaments du stage de pédiatrie, consultables hors ligne.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
 <title>Syllabus de stage pédiatrie</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,500;8..60,700&display=swap" rel="stylesheet">
@@ -115,6 +129,8 @@ strong{font-weight:700}
 .pan .res small{display:block;color:var(--muted)}
 @media(prefers-reduced-motion:no-preference){.sheet{animation:in .18s ease-out}@keyframes in{from{opacity:.4;transform:translateY(5px)}to{opacity:1;transform:none}}}
 </style>
+</head>
+<body>
 <div class="app" id="app">
  <div class="top"><div class="brand" id="brand">Syllabus de stage pédiatrie<small>Service S 51</small></div>
   <button class="ib" id="bSearch" type="button">Rechercher</button><button class="ib" id="bToc" type="button">Sommaire</button></div>
@@ -235,3 +251,8 @@ document.getElementById('bSearch').onclick=function(){
 };
 go(fromHash(),true);
 </script>
+<script>
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
+</script>
+</body>
+</html>
