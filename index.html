@@ -169,6 +169,14 @@ h3.tt{font-size:.82rem;letter-spacing:.09em;text-transform:uppercase;color:var(-
 #splash .sp-in{position:relative;z-index:2;padding:24px}
 #splash .sp-logo{width:132px;height:132px;border-radius:30px;box-shadow:0 18px 40px -14px rgba(120,60,10,.45);
  animation:spPop 1s cubic-bezier(.2,1.4,.4,1) both,spFloat 3.2s ease-in-out 1s infinite}
+#splash .sp-bear{position:relative;display:inline-block;margin-top:64px}
+#splash .sp-say{position:absolute;bottom:calc(100% + 14px);left:50%;transform-origin:50% 100%;white-space:nowrap;
+ background:#fff;color:#5a3a24;font-weight:700;font-size:1.05rem;padding:.55rem .95rem;border-radius:18px;
+ box-shadow:0 10px 24px -10px rgba(120,60,10,.45);animation:spSay .6s cubic-bezier(.2,1.5,.4,1) .9s both,spSayBob 2.4s ease-in-out 1.5s infinite}
+#splash .sp-say::after{content:"";position:absolute;left:50%;bottom:-9px;margin-left:-9px;border:9px solid transparent;border-bottom:0;border-top-color:#fff}
+@keyframes spSay{from{opacity:0;transform:translateX(-50%) scale(.3)}to{opacity:1;transform:translateX(-50%) scale(1)}}
+@keyframes spSayBob{0%,100%{transform:translateX(-50%) rotate(-2deg)}50%{transform:translateX(-50%) rotate(2deg)}}
+@media (prefers-reduced-motion:reduce){#splash .sp-say{transform:translateX(-50%)}}
 #splash h1{font-family:var(--serif);font-size:2rem;margin:1.1rem 0 .3rem;color:inherit;animation:spUp .8s ease .45s both}
 #splash p{margin:0;font-size:1.05rem;opacity:.85;animation:spUp .8s ease .75s both}
 #splash .sp-tap{position:absolute;left:0;right:0;bottom:calc(28px + env(safe-area-inset-bottom,0px));font-size:.8rem;opacity:0;animation:spFade .6s ease 1.6s forwards;z-index:2}
@@ -188,7 +196,7 @@ h3.tt{font-size:.82rem;letter-spacing:.09em;text-transform:uppercase;color:var(-
 <body>
 <div id="splash" role="presentation">
  <div class="cloud" style="top:12%;left:-60px"></div><div class="cloud" style="top:68%;right:-80px;animation-delay:-4s"></div>
- <div class="sp-in"><img class="sp-logo" src="logo.svg" alt=""><h1>Stage de pédiatrie</h1><p>Une fiche à la fois, tu vas y arriver.</p></div>
+ <div class="sp-in"><div class="sp-bear"><div class="sp-say">Martin, tu es un génie&nbsp;!</div><img class="sp-logo" src="logo.svg" alt=""></div><h1>Stage de pédiatrie</h1><p>Une fiche à la fois, tu vas y arriver.</p></div>
  <div class="sp-tap">Touche l'écran pour passer</div>
 </div>
 <div class="app" id="app">
@@ -319,7 +327,7 @@ document.getElementById('bSearch').onclick=openSearch;
  for(var i=0;i<16;i++){var b=document.createElement('span');b.className='bub';var z=8+Math.random()*34;
   b.style.cssText='width:'+z+'px;height:'+z+'px;left:'+(Math.random()*100)+'%;animation-duration:'+(5+Math.random()*6)+'s;animation-delay:'+(-Math.random()*8)+'s;--sw:'+(Math.random()*60-30)+'px';sp.appendChild(b)}
  var done=false;function close(){if(done)return;done=true;sp.classList.add('out');setTimeout(function(){sp.remove()},900)}
- sp.addEventListener('click',close);setTimeout(close,2800);})();
+ sp.addEventListener('click',close);setTimeout(close,3800);})();
 go(fromHash(),true);
 </script>
 <script>
